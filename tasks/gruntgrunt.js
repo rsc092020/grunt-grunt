@@ -21,6 +21,20 @@ module.exports = function (grunt) {
         if (!data.gruntfile) grunt.fatal('Gruntfile path missing');
         if (!data.tasks) data.tasks = ['default'];
 
+        var passThruOptions = data.passThruOptions;
+        if(passThruOptions) {
+            var args = grunt.option.flags();
+
+            if (grunt.util.kindOf(passThruOptions) === 'array') {
+                args = args.filter(function(arg) {
+                    var argName = arg.replace(/^--(no-)?/i, '');
+                    return Array.prototype.indexOf.call(passThruOptions, argName) !== -1;
+                });
+            }
+
+            Array.prototype.push.apply(data.tasks, args);
+        }
+
         grunt.log.writeln('Spawning %s task(s) in %s', chalk.underline(chalk.blue(data.tasks.join(' '))), chalk.yellow(data.gruntfile));
 
         // var args = data.tasks.concat(['--gruntfile', data.gruntfile]);
